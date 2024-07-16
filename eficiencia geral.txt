@@ -1,0 +1,36 @@
+import sys
+import os
+import streamlit as st
+import pandas as pd
+from lib.csvdb import filter_by_date_range, display_relatorio_combinado
+
+def countViagemCarro(df):
+    # Filtrar apenas as viagens planejadas e realizadas
+    viagens_realizadas = df[df['Status'] == 'VIAGEM PLANEJADA E REALIZADA']
+    # Agrupar por 'Veículo Real' e contar viagens planejadas e realizadas
+    count_viagens = viagens_realizadas.groupby('Veículo Real').size().reset_index(name='Count')
+    # Calcular o total de viagens planejadas e realizadas por carro
+    total_viagens_carro = df.groupby('Veículo Real').size().reset_index(name='Total Viagens')
+    # Mesclar os resultados
+    resultado = pd.merge(count_viagens, total_viagens_carro, on='Veículo Real', how='left')
+    return resultado
+
+def eficienciaComunicação():
+    st.write("Eficiência de Comunicação")
+    col1, col2 = st.columns(2)
+    
+    # Selecionar o intervalo de datas
+    with col1:
+        data_inicio = pd.to_datetime(st.date_input("Selecione a data de início:"))
+    with col2:
+        data_fim = pd.to_datetime(st.date_input("Selecione a data de término:"))
+    
+    # Filtrar o relatório combinado pelo intervalo de datas
+    relatorio_filtrado_df = filter_by_date_range(data_inicio, data_fim)
+    
+    # Contar viagens planejadas e realizadas por carro
+    resultado_count = countViagemCarro(relatorio_filtrado_df)
+    
+    # Exibir resultado
+    st.write("Contagem de Viagens Planejadas e Realizadas por Carro:")
+    st.write(resultado_count)
