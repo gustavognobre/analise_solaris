@@ -21,15 +21,14 @@ def inserirDados():
         processed_files = 0
         
         for idx, csv_file in enumerate(csv_files):
+            progress_bar.progress((processed_files / total_files))
             relatorio_combinado_df = process_csv_file(csv_file, relatorio_combinado_df)
             processed_files += 1
-            
             # Atualizar a barra de progresso
-            progress_bar.progress((processed_files / total_files))
+
             progress_text.text(f"Processando arquivo {processed_files} de {total_files}")
         
         # Após o processamento, exibir o relatório combinado atualizado
         st.write("Relatório Combinado Atualizado:")
-        st.write(relatorio_combinado_df)
     else:
         st.write("Nenhum arquivo CSV selecionado.")
